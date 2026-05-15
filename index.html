@@ -320,15 +320,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
       <div class="section-hd">평가위원별 등록 현황</div>
       <div id="admin-committee-summary" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px;"></div>
 
-      <!-- 등록 내용 상세 -->
-      <div class="section-hd" id="admin-detail-hd">등록 내용 상세</div>
-      <div style="overflow-x:auto;margin-bottom:16px;">
-        <table class="tbl">
-          <colgroup><col style="width:36px"><col><col style="width:56px"><col style="width:50px"><col><col style="width:110px"></colgroup>
-          <thead><tr><th>연번</th><th>부서명</th><th>유형</th><th>등급</th><th>의견</th><th>등록일시</th></tr></thead>
-          <tbody id="admin-reg-tbody"><tr><td colspan="6" class="loading">조회 버튼을 눌러주세요</td></tr></tbody>
-        </table>
-      </div>
+
 
       <!-- 평가위원별 등급 비교 -->
       <div class="section-hd">평가위원별 등급 비교</div>
@@ -594,47 +586,9 @@ async function loadAdminView(){
     }).join('');
   }
 
-  // ── 2. 상세 조회 ──
+  // ── 2. 특정 평가위원 선택 시 상세 조회 (별도 팝업/섹션 없이 카드 클릭으로 대체) ──
   const selectedEval = evaluatorSel.value;
-  const detailHd = document.getElementById('admin-detail-hd');
-  const filteredResults = selectedEval
-    ? results.filter(r=>r.evaluator_name===selectedEval)
-    : results;
-
-  if(selectedEval){
-    const member = members.find(m=>m.email===selectedEval);
-    detailHd.textContent = `${member?.name||selectedEval} — 등록 내용 상세`;
-  } else {
-    detailHd.textContent = '등록 내용 상세 (전체 평가위원)';
-  }
-
-  // 미등록 부서 파악
-  const registeredOrgs = new Set(filteredResults.map(r=>r.org_name));
-  const unregisteredOrgs = selectedEval ? orgsOfType.filter(o=>!registeredOrgs.has(o.org_name)) : [];
-
-  const detailTb = document.getElementById('admin-reg-tbody');
   const gradeMap = {S:'badge-s',A:'badge-a',B:'badge-b',C:'badge-c'};
-  if(!filteredResults.length && !unregisteredOrgs.length){
-    detailTb.innerHTML='<tr><td colspan="6" class="empty">등록된 결과가 없습니다</td></tr>';
-  } else {
-    const registeredRows = filteredResults.map((r,i)=>`<tr>
-      <td class="center">${i+1}</td>
-      <td style="font-size:12px;">${r.org_name}</td>
-      <td class="center"><span class="badge ${r.org_type==='1유형'?'badge-t1':'badge-t2'}">${r.org_type}</span></td>
-      <td class="center"><span class="badge ${gradeMap[r.grade]||''}">${r.grade||'—'}</span></td>
-      <td style="font-size:12px;color:var(--text2);">${r.comment||'—'}</td>
-      <td class="center" style="font-size:11px;color:var(--text3);">${r.created_at?new Date(r.created_at).toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—'}</td>
-    </tr>`).join('');
-    const unregisteredRows = unregisteredOrgs.map(o=>`<tr style="background:#FFF8F8;">
-      <td class="center">—</td>
-      <td style="font-size:12px;color:#A32D2D;">${o.org_name} <span style="font-size:10px;background:#FCEBEB;color:#A32D2D;padding:1px 6px;border-radius:20px;">미등록</span></td>
-      <td class="center"><span class="badge ${o.org_type==='1유형'?'badge-t1':'badge-t2'}">${o.org_type}</span></td>
-      <td class="center" style="color:var(--text3);">—</td>
-      <td style="color:var(--text3);">—</td>
-      <td style="color:var(--text3);">—</td>
-    </tr>`).join('');
-    detailTb.innerHTML = registeredRows + unregisteredRows;
-  }
 
   // ── 3. 평가위원별 등급 비교 ──
   const evalEmails = [...new Set(results.map(r=>r.evaluator_name))];
