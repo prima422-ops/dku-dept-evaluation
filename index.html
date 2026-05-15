@@ -590,9 +590,9 @@ async function loadAdminView(){
   const selectedEval = evaluatorSel.value;
   const gradeMap = {S:'badge-s',A:'badge-a',B:'badge-b',C:'badge-c'};
 
-  // ── 3. 평가위원별 등급 비교 ──
-  const evalEmails = [...new Set(results.map(r=>r.evaluator_name))];
-  const evalNames = evalEmails.map(e=>{ const m=members.find(m=>m.email===e); return m?.name||e; });
+  // ── 3. 평가위원별 등급 비교 (7-3 등록 순서 기준) ──
+  const evalEmails = members.filter(m=>m.email).map(m=>m.email);
+  const evalNames = members.filter(m=>m.email).map(m=>m.name||m.email);
 
   const compareThead = document.getElementById('admin-compare-thead');
   const compareTbody = document.getElementById('admin-compare-tbody');
